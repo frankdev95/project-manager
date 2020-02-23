@@ -1,0 +1,39 @@
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.collections.*?>
+<?import java.lang.String?>
+
+<DialogPane fx:controller="application.DialogController" 
+		  xmlns:fx="http://javafx.com/fxml/1">
+		  
+	<headerText>
+		Change the due date of the project and the total fee paid to date.
+	</headerText>
+	<content>
+		<GridPane vgap="10" hgap="10">
+			<padding>
+				<Insets top="40" left="20"/>
+			</padding>
+			<Label text="Project Number" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+			<TextField fx:id="projectNumber" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+			<Label text="Change Due Date" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+			<DatePicker fx:id="projectDeadline" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+			<Label text="Project Amount Paid" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+			<TextField fx:id="projectPaid" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+			<Label text="Contractor House" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+			<TextField fx:id="contractorAdrHouse" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+			<Label text="Contractor Street" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+			<TextField fx:id="contractorAdrStreet" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+			<Label text="Contractor City" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+			<TextField fx:id="contractorAdrCity" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+			<Label text="Contractor Postcode" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+			<TextField fx:id="contractorAdrPostcode" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+			<Label text="Finalised" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+			<TextField fx:id="projectFinalised" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+		</GridPane>
+	</content>
+ </DialogPane>
+	

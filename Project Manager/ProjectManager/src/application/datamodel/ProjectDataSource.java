@@ -1,0 +1,536 @@
+package application.datamodel;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+
+import javafx.collections.FXCollections;
+import javafx.scene.control.DatePicker;
+
+/* Create a class to manage the connection and queries to the sqlite database. */
+
+public class ProjectDataSource {
+	
+	/* Set constant variables for managing the database. */
+	
+	/* Set the name of the database and the connection string used to connect to the database. */
+	private static final String DB_NAME = "projects.db";
+	private static final String CONNECTION_STRING = "jdbc:sqlite:C:\\Users\\frank\\Dropbox\\Frank Lockett-48097\\Introduction to Software Engineering\\Task 7\\" + DB_NAME;
+	
+	/* Set constants for the table and column names for each table. */
+	/* Project Table */
+	private static final String TABLE_PROJECT_VIEW = "projects";
+	private static final String TABLE_PROJECT = "project";
+	private static final String COLUMN_PROJECT_ID = "_id";
+	private static final String COLUMN_PROJECT_NUMBER = "number";
+	private static final String COLUMN_PROJECT_NAME = "name";
+	private static final String COLUMN_PROJECT_BUILDING = "building";
+	private static final String COLUMN_PROJECT_ADDRESS = "adress";
+	private static final String COLUMN_PROJECT_INVOICE = "invoice";
+	private static final String COLUMN_PROJECT_CUSTOMER = "customer";
+	private static final String COLUMN_PROJECT_ARCHITECT= "architect";
+	private static final String COLUMN_PROJECT_CONTRACTOR = "contractor";
+	private static final String COLUMN_PROJECT_FINALISED = "completed";
+	
+	/* Address Table */
+	private static final String TABLE_ADDRESS = "address";
+	private static final String COLUMN_ADDRESS_ID = "_id";
+	private static final String COLUMN_ADDRESS_HOUSE = "house";
+	private static final String COLUMN_ADDRESS_STREET = "street";
+	private static final String COLUMN_ADDRESS_CITY = "city";
+	private static final String COLUMN_ADDRESS_POSTCODE = "postcode";
+	
+	/* Invoice Table */
+	private static final String TABLE_INVOICE = "invoice";
+	private static final String COLUMN_INVOICE_ID = "_id";
+	private static final String COLUMN_INVOICE_CUSTOMER = "customer";
+	private static final String COLUMN_INVOICE_ERF = "erf";
+	private static final String COLUMN_INVOICE_CHARGE= "charged";
+	private static final String COLUMN_INVOICE_PAID = "paid";
+	private static final String COLUMN_INVOICE_DEADLINE= "deadline";
+	
+	/* Customer Table */
+	private static final String TABLE_CUSTOMER = "customer";
+	private static final String COLUMN_CUSTOMER_ID = "_id";
+	private static final String COLUMN_CUSTOMER_FIRST_NAME = "first_name";
+	private static final String COLUMN_CUSTOMER_LAST_NAME = "last_name";
+	private static final String COLUMN_CUSTOMER_NUMBER = "phone";
+	private static final String COLUMN_CUSTOMER_EMAIL = "email";
+	private static final String COLUMN_CUSTOMER_ADDRESS = "address";
+	
+	/* Contractor Table */
+	private static final String TABLE_CONTRACTOR = "contractor";
+	private static final String COLUMN_CONTRACTOR_ID = "_id";
+	private static final String COLUMN_CONTRACTOR_FIRST_NAME = "first_name";
+	private static final String COLUMN_CONTRACTOR_LAST_NAME = "last_name";
+	private static final String COLUMN_CONTRACTOR_NUMBER = "phone";
+	private static final String COLUMN_CONTRACTOR_EMAIL = "email";
+	private static final String COLUMN_CONTRACTOR_ADDRESS = "address";
+	
+	/* Project Table */
+	private static final String TABLE_ARCHITECT = "architect";
+	private static final String COLUMN_ARCHITECT_ID = "_id";
+	private static final String COLUMN_ARCHITECT_FIRST_NAME = "first_name";
+	private static final String COLUMN_ARCHITECT_LAST_NAME = "last_name";
+	private static final String COLUMN_ARCHITECT_NUMBER = "phone";
+	private static final String COLUMN_ARCHITECT_EMAIL = "email";
+	private static final String COLUMN_ARCHITECT_ADDRESS = "address";
+
+	/*
+	 * SQL query statements which allow insertion of new records into the database.
+	 * Prepare the sql strings used as the parameter in the prepared statement.
+	 */
+	
+	/* Insert customer record into the customer table. */
+	public static final String INSERT_CUSTOMER = "INSERT INTO " + TABLE_CUSTOMER + " (" + COLUMN_CUSTOMER_FIRST_NAME + ", "
+			+ COLUMN_CONTRACTOR_LAST_NAME + "," + COLUMN_CUSTOMER_NUMBER + ", " + COLUMN_CONTRACTOR_EMAIL + ", " + COLUMN_CUSTOMER_ADDRESS
+			+ ") VALUES(?, ?, ?, ?, ?)";
+	
+	/* Insert architect record into the architect table. */
+	public static final String INSERT_ARCHITECT = "INSERT INTO " + TABLE_ARCHITECT + " (" + COLUMN_ARCHITECT_FIRST_NAME + ", "
+			+ COLUMN_ARCHITECT_LAST_NAME + ", " + COLUMN_ARCHITECT_NUMBER + ", " + COLUMN_ARCHITECT_EMAIL + ", " + COLUMN_ARCHITECT_ADDRESS
+			+ ") VALUES(?, ?, ?, ?, ?)";
+
+	/* Insert contractor record into the contractor table. */
+	public static final String INSERT_CONTRACTOR = "INSERT INTO " + TABLE_CONTRACTOR + " (" + COLUMN_CONTRACTOR_FIRST_NAME
+			+ ", " + COLUMN_CONTRACTOR_LAST_NAME + ", " + COLUMN_CONTRACTOR_NUMBER + ", " + COLUMN_CONTRACTOR_EMAIL + ", " + COLUMN_CONTRACTOR_ADDRESS
+			+ ") VALUES(?, ?, ?, ?, ?)";
+	
+	/* Insert address record into the address table. */
+	public static final String INSERT_ADDRESS = "INSERT INTO " + TABLE_ADDRESS + " (" + COLUMN_ADDRESS_HOUSE + ", "
+			+ COLUMN_ADDRESS_STREET + ", " + COLUMN_ADDRESS_CITY + ", " + COLUMN_ADDRESS_POSTCODE
+			+ ") VALUES (?, ?, ?, ?)";
+	
+	/* Insert customer record into the customer table. */
+	public static final String INSERT_INVOICE = "INSERT INTO " + TABLE_INVOICE + "(" + COLUMN_INVOICE_CUSTOMER + ", "
+			+ COLUMN_INVOICE_ERF + ", " + COLUMN_INVOICE_CHARGE + ", " + COLUMN_INVOICE_PAID + ", "
+			+ COLUMN_INVOICE_DEADLINE + ") VALUES (?, ?, ?, ?, ?)";
+	
+	/* Insert project record into the project table. */
+	public static final String INSERT_PROJECT = "INSERT INTO " + TABLE_PROJECT + "(" + COLUMN_PROJECT_NUMBER + ", "
+			+ COLUMN_PROJECT_NAME + ", " + COLUMN_PROJECT_BUILDING + ", " + COLUMN_PROJECT_ADDRESS + ", "
+			+ COLUMN_PROJECT_INVOICE + ", " + COLUMN_PROJECT_CUSTOMER + ", " + COLUMN_PROJECT_ARCHITECT + ", "
+			+ COLUMN_PROJECT_CONTRACTOR + ", " + COLUMN_PROJECT_FINALISED + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+	/* Create a view table which brings together information about each project from different tables. */
+	public static final String CREATE_VIEW_TABLE_ALL = "CREATE VIEW IF NOT EXISTS " + TABLE_PROJECT_VIEW + " AS SELECT "
+			+ TABLE_PROJECT + "." + COLUMN_PROJECT_ID + ", " + TABLE_PROJECT + "." + COLUMN_PROJECT_NUMBER + ", "
+			+ TABLE_PROJECT + "." + COLUMN_PROJECT_NAME + ", " + TABLE_PROJECT + "." + COLUMN_PROJECT_BUILDING + ", "
+			+ TABLE_INVOICE + "." + COLUMN_INVOICE_ERF + ", " + TABLE_INVOICE + "." + COLUMN_INVOICE_CHARGE + ", "
+			+ TABLE_INVOICE + "." + COLUMN_INVOICE_PAID + ", " + TABLE_INVOICE + "." + COLUMN_INVOICE_DEADLINE + ", "
+			+ TABLE_CUSTOMER + "." + COLUMN_CUSTOMER_FIRST_NAME + ", " + TABLE_CUSTOMER + "." + COLUMN_CUSTOMER_LAST_NAME
+			+ ", " + TABLE_CUSTOMER + "." + COLUMN_CUSTOMER_NUMBER + ", " + TABLE_CUSTOMER + "." + COLUMN_CUSTOMER_EMAIL
+			+ ", " + TABLE_CONTRACTOR + "." + COLUMN_CONTRACTOR_FIRST_NAME + ", " + TABLE_CONTRACTOR
+			+ "." + COLUMN_CONTRACTOR_LAST_NAME + ", " + TABLE_CONTRACTOR + "." + COLUMN_CONTRACTOR_NUMBER + ", "
+			+ TABLE_CONTRACTOR + "." + COLUMN_CONTRACTOR_EMAIL + ", " + TABLE_ARCHITECT + "."
+			+ COLUMN_ARCHITECT_FIRST_NAME + ", " + TABLE_ARCHITECT + "." + COLUMN_ARCHITECT_LAST_NAME + ", " + TABLE_ARCHITECT
+			+ "." + COLUMN_ARCHITECT_NUMBER + ", " + TABLE_ARCHITECT + "." + COLUMN_ARCHITECT_EMAIL + " FROM "
+			+ TABLE_PROJECT + " INNER JOIN " + TABLE_INVOICE + " ON " + TABLE_PROJECT + "." + COLUMN_PROJECT_INVOICE
+			+ " = " + TABLE_INVOICE + "." + COLUMN_INVOICE_ID + " INNER JOIN " + TABLE_ARCHITECT + " ON "
+			+ TABLE_PROJECT + "." + COLUMN_PROJECT_ARCHITECT + " = " + TABLE_ARCHITECT + "." + COLUMN_ARCHITECT_ID
+			+ " INNER JOIN " + TABLE_CUSTOMER + " ON " + TABLE_PROJECT + "." + COLUMN_PROJECT_CUSTOMER + " = "
+			+ TABLE_CUSTOMER + "." + COLUMN_CUSTOMER_ID + " INNER JOIN " + TABLE_CONTRACTOR + " ON " + TABLE_PROJECT
+			+ "." + COLUMN_PROJECT_CONTRACTOR + " = " + TABLE_CONTRACTOR + "." + COLUMN_CONTRACTOR_ID;
+	
+	
+	/* Create a connection object. */
+	private Connection conn;
+	
+	/* Create the prepared statement objects to protect against sql injection. */
+	private PreparedStatement insertAddress;
+	private PreparedStatement insertCustomer;
+	private PreparedStatement insertInvoice;
+	private PreparedStatement insertContractor;
+	private PreparedStatement insertArchitect;
+	private PreparedStatement insertProject;
+
+	/* Open the connection to the database or throw an SQLException if unable to */
+	public boolean open() {
+		try {
+			// Set up the connection or create a new database using the connection string constant.
+			conn = DriverManager.getConnection(CONNECTION_STRING);
+			
+			// Create the tables needed to store the different data for each project.
+			createAllTables();
+			
+			// Prepare the prepared statement with permission to return the generated id key.
+			insertAddress = conn.prepareStatement(INSERT_ADDRESS, Statement.RETURN_GENERATED_KEYS);
+			insertCustomer = conn.prepareStatement(INSERT_CUSTOMER, Statement.RETURN_GENERATED_KEYS);
+			insertInvoice = conn.prepareStatement(INSERT_INVOICE, Statement.RETURN_GENERATED_KEYS);
+			insertContractor = conn.prepareStatement(INSERT_CONTRACTOR, Statement.RETURN_GENERATED_KEYS);
+			insertArchitect = conn.prepareStatement(INSERT_ARCHITECT, Statement.RETURN_GENERATED_KEYS);
+			insertProject = conn.prepareStatement(INSERT_PROJECT);
+			
+			// Return true if all the code executed successfully.
+			return true;
+			
+		} catch (SQLException e) {
+			System.out.print("Connection to database error: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/* Close any prepared statements and the connection to the database. */
+	public void close() {
+		try {
+			
+			if(insertAddress  != null) {insertAddress.close();}
+			if(insertCustomer != null) {insertCustomer.close();}
+			if(insertContractor != null) {insertContractor.close();}
+			if(insertArchitect != null) {insertArchitect.close();}
+			if(insertInvoice != null) {insertArchitect.close();}
+			if(insertProject != null) {insertProject.close();}
+			
+			if(conn != null) {
+				conn.close();
+			}
+			
+		} catch (Exception e) {
+			System.out.print("Database connection close error: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	private void createPersonTables() {
+		executeStatement(createTableByIndividual("customer"));	
+		executeStatement(createTableByIndividual("architect"));	
+		executeStatement(createTableByIndividual("contractor"));	
+	}
+	
+	// Execute the functions which create the tables for the project data.	
+	public void createAllTables() {
+		createProjectTable();
+		createAddressTable();
+		createInvoiceTable();
+		createPersonTables();
+	}
+
+	
+	
+	/* Create the project table with an sql query using the column constants. */
+	private void createProjectTable() {
+		
+		String sql = "CREATE TABLE IF NOT EXISTS project ("
+				+ COLUMN_PROJECT_ID + " INTEGER PRIMARY KEY, "
+				+ COLUMN_PROJECT_NUMBER + " INTEGER, "
+				+ COLUMN_PROJECT_NAME + " TEXT NOT NULL, "
+				+ COLUMN_PROJECT_BUILDING + " TEXT NOT NULL, "
+				+ COLUMN_PROJECT_ADDRESS + " INTEGER, "
+				+ COLUMN_PROJECT_INVOICE + " INTEGER, "
+				+ COLUMN_PROJECT_CUSTOMER + " INTEGER, "
+				+ COLUMN_PROJECT_CONTRACTOR + " INEGER, "
+				+ COLUMN_PROJECT_ARCHITECT + " INTEGER, "
+				+ COLUMN_PROJECT_FINALISED + " TEXT NOT NULL);";
+		
+		executeStatement(sql);
+	}
+	
+	/* Create address table. */
+	private void createAddressTable() {
+		
+		String sql = "CREATE TABLE IF NOT EXISTS address ("
+				+ COLUMN_ADDRESS_ID + " INTEGER PRIMARY KEY, "
+				+ COLUMN_ADDRESS_HOUSE + " TEXT NOT NULL, "
+				+ COLUMN_ADDRESS_STREET + " TEXT NOT NULL, "
+				+ COLUMN_ADDRESS_CITY + " TEXT NOT NULL, "
+				+ COLUMN_ADDRESS_POSTCODE + " TEXT NOT NULL);";
+		
+		executeStatement(sql);
+	}
+	
+	/* Create Invoice table. */
+	private void createInvoiceTable() {
+		
+		String sql = "CREATE TABLE IF NOT EXISTS invoice ("
+				+ COLUMN_INVOICE_ID + " INTEGER PRIMARY KEY, "
+				+ COLUMN_INVOICE_CUSTOMER + " INTEGER, "
+				+ COLUMN_INVOICE_ERF + " INTEGER, "
+				+ COLUMN_INVOICE_CHARGE + " INTEGER, "
+				+ COLUMN_INVOICE_PAID + " INTEGER, "
+				+ COLUMN_INVOICE_DEADLINE + " TEXT NOT NULL);";
+		
+		executeStatement(sql);
+	}
+	
+	/* 
+	 * Create a table representing a specific person associated with the project . 
+	 * Return the sql query string for when executing the query. 
+	 */
+	public String createTableByIndividual(String tableName) {
+		
+		String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "("
+				+ "_id INTEGER PRIMARY KEY, "
+				+ "first_name TEXT NOT NULL, "
+				+ "last_name TEXT NOT NULL, "
+				+ "phone TEXT NOT NULL, "
+				+ "email TEXT NOT NULL, "
+				+ "address INTEGER);";
+		
+		return sql;
+	}
+	
+	public void finaliseProject(int projectId, String completed) {
+		
+		// Set the query string which updates the completed column in the project table.
+		String updateSql = "UPDATE project SET completed = \"" + completed + "\"" + " WHERE _id = " + projectId;
+		
+		// Open the connection to the database.
+		open();
+		
+		// Use a try and catch with resources block to create and execute the query,
+		// and throw an error if unable to carry out the query.
+		try (Statement statement = conn.createStatement()) {
+			statement.execute(updateSql);
+		} catch (SQLException e) {
+			System.out.println("Error finalising project: " + e.getMessage());
+		} finally {
+			// Close the connection no matter the outcome.
+			close();
+		}
+	}
+	
+	public void updateInvoiceDetails(int projectId, String deadline, int projectPaid) {
+		int invoiceId = 0;
+
+		// Create the query string which receives the correct invoice id from the
+		// project table.
+		String querySql = "SELECT invoice FROM project WHERE project._id = " + projectId;
+
+		open();
+
+		// Try and execute the query, and if successful store a reference to the correct
+		// invoice id.
+		try (Statement statement = conn.createStatement(); ResultSet results = statement.executeQuery(querySql)) {
+			while (results.next()) {
+				invoiceId = results.getInt(1);
+			}
+
+			// Create the query string to update details about a specific project located
+			// inside the invoice table.
+			String updateSql = "UPDATE invoice SET deadline = \"" + deadline + "\", paid = " + projectPaid
+					+ " WHERE _id = " + invoiceId;
+			try {
+				statement.execute(updateSql);
+			} catch (SQLException e) {
+				System.out.println("Error updating invoice: " + e.getMessage());
+			}
+		} catch (SQLException e2) {
+			System.out.println("Error selecting invoice id: " + e2.getMessage());
+		} finally {
+			close();
+		}
+
+		
+	}
+	
+	public void updateContractorDetails(int projectId, String adrHouse, String adrStreet, String adrCity, String adrPostcode) {
+		int addressId = 0;
+		
+		// Create the query string to receive the contractor id from the project table.
+		String querySql = "SELECT contractor.address FROM project "
+				+ "INNER JOIN contractor ON project.contractor = contractor._id "
+				+ "WHERE project._id = " + projectId; 
+
+		open();
+		
+		// Execute the query, and if successful store a reference to the contractors address id.
+		try (Statement statement = conn.createStatement();
+				ResultSet results = statement.executeQuery(querySql)){
+			while(results.next()) {
+				addressId = results.getInt(1);
+			}
+			
+			// Create the query to update the contractors address details.
+			String updateSql = "UPDATE address SET house = \"" + adrHouse + "\", street = \"" + adrStreet
+					 + "\", city = \"" + adrCity + "\", postcode = \"" + adrPostcode + "\" WHERE _id = " + addressId;
+			
+			// Execute the update query, and catch the sql error if it is unsuccessful.
+			try {
+				statement.execute(updateSql);
+			} catch (SQLException e) {
+				System.out.println("Error updating contractor address " + e.getMessage());
+				System.out.println(updateSql);
+			}
+		} catch (SQLException e) {
+			System.out.println("Error selecting invoice id " + e.getMessage());
+		} finally {
+			close();
+		}
+	
+	}
+	
+	// Execute a query received via parameter, and throw an error if it is unsuccessful.
+	private void executeStatement(String sql) {
+		try (Statement statement = conn.createStatement()){
+			statement.execute(sql);
+		} catch (SQLException e) {
+			System.out.println("Error creating table: " + e.getMessage()); 
+		}
+	}
+	
+	
+	/* 
+	 * Set the correct data to the prepared statement and execute. 
+	 * Return the affected rows and if none were affected throw an SQLException.
+	 */
+	
+	/* Insert Project Entry */
+	public void insertProject(int number, String name, String building, int address, int invoice, int customer, int contractor, int architect) throws SQLException {
+		
+		insertProject.setInt(1, number);
+		insertProject.setString(2, name);
+		insertProject.setString(3, building);
+		insertProject.setInt(4, address);
+		insertProject.setInt(5, invoice);
+		insertProject.setInt(6, customer);
+		insertProject.setInt(7, architect);
+		insertProject.setInt(8, contractor);
+		insertProject.setString(9, "No");
+		
+		int affectedRows = insertProject.executeUpdate();
+		
+		if(affectedRows != 1) {
+			throw new SQLException("Couldn't insert new project");
+		}
+
+	}
+	
+	/* 
+	 * Set the correct data to the prepared statement and execute. 
+	 * Return the affected rows and if none were affected throw an SQLException.
+	 * Return the generated id key for later reference.
+	 */
+	
+	/* Insert Address Entry */
+	public int insertAddress(String house, String street, String city, String postcode) throws SQLException {
+
+		insertAddress.setString(1, house);
+		insertAddress.setString(2, street);
+		insertAddress.setString(3, city);
+		insertAddress.setString(4, postcode);
+		
+		int affectedRows = insertAddress.executeUpdate();
+		
+		if(affectedRows != 1) {
+			throw new SQLException("Couldn't insert new customer address");
+		}
+		
+		ResultSet generatedKeys = insertAddress.getGeneratedKeys();
+		
+		if(generatedKeys.next()) {
+			return generatedKeys.getInt(1);
+		} else {
+			throw new SQLException("Couldn't get _id for generated customer address key");
+		}
+	}
+	
+	/* Insert Customer Entry */
+	public int insertCustomer(String first_name, String last_name, String phone, String email, int addressId) throws SQLException {
+		
+		insertCustomer.setString(1, first_name);
+		insertCustomer.setString(2, last_name);
+		insertCustomer.setString(3, phone);
+		insertCustomer.setString(4, email);
+		insertCustomer.setInt(5, addressId);
+		
+		int affectedRows = insertCustomer.executeUpdate();
+		
+		if(affectedRows != 1) {
+			throw new SQLException("Couldn't insert new customer");
+		}
+		
+		ResultSet generatedKeys = insertCustomer.getGeneratedKeys();
+		
+		if(generatedKeys.next()) {
+			return generatedKeys.getInt(1);
+		} else {
+			throw new SQLException("Couldn't get _id for generated customer key");
+		}
+
+	}
+
+	/* Insert Architect Entry */
+	public int insertArchitect(String first_name, String last_name, String phone, String email, int addressId) throws SQLException {
+
+		insertArchitect.setString(1, first_name);
+		insertArchitect.setString(2, last_name);
+		insertArchitect.setString(3, phone);
+		insertArchitect.setString(4, email);
+		insertArchitect.setInt(5, addressId);
+		     
+		int affectedRows = insertArchitect.executeUpdate();
+		
+		if(affectedRows != 1) {
+			throw new SQLException("Couldn't insert new customer");
+		}
+		
+		ResultSet generatedKeys = insertArchitect.getGeneratedKeys();
+		
+		if(generatedKeys.next()) {
+			return generatedKeys.getInt(1);
+		} else {
+			throw new SQLException("Couldn't get _id for generated architect key");
+		}
+
+	}
+	
+	/* Insert Contractor Entry */
+	public int insertContractor(String first_name, String last_name, String phone, String email, int addressId) throws SQLException {
+
+		insertContractor.setString(1, first_name);
+		insertContractor.setString(2, last_name);
+		insertContractor.setString(3, phone);
+		insertContractor.setString(4, email);
+		insertContractor.setInt(5, addressId);
+		     
+		int affectedRows = insertContractor.executeUpdate();
+		
+		if(affectedRows != 1) {
+			throw new SQLException("Couldn't insert new customer");
+		}
+		
+		ResultSet generatedKeys = insertContractor.getGeneratedKeys();
+		
+		if(generatedKeys.next()) {
+			return generatedKeys.getInt(1);
+		} else {
+			throw new SQLException("Couldn't get _id for generated contractor key");
+		}
+
+	}
+	
+	/* Insert Invoice Entry */
+	public int insertInvoice(int customerId, int erfNumber, int projectFee, int projectPaid, String deadline) throws SQLException {
+		
+		insertInvoice.setInt(1, customerId);
+		insertInvoice.setInt(2, erfNumber);
+		insertInvoice.setInt(3, projectFee);
+		insertInvoice.setInt(4, projectPaid);
+		insertInvoice.setString(5, deadline);
+		
+		int affectedRows = insertInvoice.executeUpdate();
+		
+		if(affectedRows != 1) {
+			throw new SQLException("Couldn't insert new customer");
+		}
+		
+		ResultSet generatedKeys = insertInvoice.getGeneratedKeys();
+		
+		if(generatedKeys.next()) {
+			return generatedKeys.getInt(1);
+		} else {
+			throw new SQLException("Couldn't get _id for generated customer key");
+		}
+	}
+	
+	
+}

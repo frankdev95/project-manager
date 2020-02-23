@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.collections.*?>
+<?import java.lang.String?>
+
+<BorderPane fx:id="mainBorderPane" fx:controller="application.Controller" 
+		  xmlns:fx="http://javafx.com/fxml/1">
+	
+	<top>
+		<MenuBar>
+			<Menu text="File">
+				<items>
+					<MenuItem text= "New Project"/>
+					<SeparatorMenuItem/>
+					<MenuItem text="Edit Project" onAction="#showEditProjectDialog"/>
+					<SeparatorMenuItem/>
+					<MenuItem text="Exit"/>
+				</items>
+			</Menu>
+		</MenuBar>
+	</top>
+	<left>
+		<ListView>
+		
+		</ListView>
+	</left>
+	<center>
+		<VBox>
+			<padding>
+				<Insets left="50" bottom="20" top="30"/>
+			</padding>
+			<Label text="Project Overview">
+				<font>
+					<Font name="Cambria Math bold" size="30"/>
+				</font>
+			</Label>
+			<GridPane VBox.vgrow="ALWAYS" hgap="60">
+				<padding>
+					<Insets top="30"/>
+				</padding>
+				<GridPane GridPane.rowIndex="0" hgap="40" vgap="10">
+					<Label GridPane.rowIndex="0" GridPane.columnIndex="0" text="Project Number"/>
+					<TextField  fx:id="projectNumber" GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="150"/>
+					<Label GridPane.rowIndex="1" GridPane.columnIndex="0" text="Project Name"/>
+					<TextField fx:id="projectName" GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="150"/>
+					<Label GridPane.rowIndex="2" GridPane.columnIndex="0" text="Building Type"/>
+					<TextField fx:id="buildingType" GridPane.rowIndex="2" GridPane.columnIndex="1" maxWidth="150"/>
+					<Label GridPane.rowIndex="3" GridPane.columnIndex="0" text="ERF Number"/>
+					<TextField fx:id="erfNumber" GridPane.rowIndex="3" GridPane.columnIndex="1" maxWidth="150"/>
+					<Label GridPane.rowIndex="4" GridPane.columnIndex="0" text="Project Fee Charged"/>
+					<TextField fx:id="projectFee" GridPane.rowIndex="4" GridPane.columnIndex="1" maxWidth="150"/>
+					<Label GridPane.rowIndex="5" GridPane.columnIndex="0" text="Project Fee Paid"/>
+					<TextField fx:id="projectPaid" GridPane.rowIndex="5" GridPane.columnIndex="1" maxWidth="150"/>
+					<Label GridPane.rowIndex="6" GridPane.columnIndex="0" text="Project Deadline"/>
+					<DatePicker fx:id="projectDeadline" GridPane.rowIndex="6" GridPane.columnIndex="1" maxWidth="150"/>
+					
+					<Label GridPane.rowIndex="7" GridPane.columnIndex="0" text="Project Adress">
+						<padding>
+							<Insets top="20"/>
+						</padding>
+						<font>
+							<Font name="Cambria Math" size="16"/>
+						</font>
+					</Label>
+					
+					<Label GridPane.rowIndex="8" GridPane.columnIndex="0" text="House Number/Name"/>
+					<TextField fx:id="projectAdrHouse" GridPane.rowIndex="8" GridPane.columnIndex="1" maxWidth="80"/>
+					<Label GridPane.rowIndex="9" GridPane.columnIndex="0" text="Street Name"/>
+					<TextField fx:id="projectAdrStreet" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="10" GridPane.columnIndex="0" text="City"/>
+					<TextField fx:id="projectAdrCity" GridPane.rowIndex="10" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="11" GridPane.columnIndex="0" text="Post Code"/>
+					<TextField fx:id="projectAdrPostCode" GridPane.rowIndex="11" GridPane.columnIndex="1"/>
+				</GridPane>
+				<GridPane GridPane.rowIndex="0" GridPane.columnIndex="1" hgap="40" vgap="10">
+				
+					<Label GridPane.rowIndex="0" GridPane.columnIndex="0" text="Architect">
+						<font>
+							<Font name="Cambria Math" size="16"/>
+						</font>
+					</Label>
+					
+					<Label GridPane.rowIndex="1" GridPane.columnIndex="0" text="First Name"/>
+					<TextField fx:id="architectFirstName" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="2" GridPane.columnIndex="0" text="Last Name"/>
+					<TextField fx:id="architectLastName" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="3" GridPane.columnIndex="0" text="Phone Number"/>
+					<TextField fx:id="architectPhone" GridPane.rowIndex="3" GridPane.columnIndex="1"/>  
+					<Label GridPane.rowIndex="4" GridPane.columnIndex="0" text="Email Address"/>
+					<TextField fx:id="architectEmail" GridPane.rowIndex="4" GridPane.columnIndex="1"/> 
+					
+					<Label GridPane.rowIndex="5" GridPane.columnIndex="0" text="Contractor">
+						<padding>
+							<Insets top="20"/>
+						</padding>
+						<font>
+							<Font name="Cambria Math" size="16"/>
+						</font>
+					</Label>
+					
+					<Label GridPane.rowIndex="6" GridPane.columnIndex="0" text="First Name"/>
+					<TextField fx:id="contractorFirstName" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="7" GridPane.columnIndex="0" text="Last Name"/>
+					<TextField fx:id="contractorLastName" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="8" GridPane.columnIndex="0" text="Phone Number"/>
+					<TextField fx:id="contractorPhone" GridPane.rowIndex="8" GridPane.columnIndex="1"/>  
+					<Label GridPane.rowIndex="9" GridPane.columnIndex="0" text="Email Address"/>
+					<TextField fx:id="contractorEmail" GridPane.rowIndex="9" GridPane.columnIndex="1"/> 
+				
+					<Label GridPane.rowIndex="10" GridPane.columnIndex="0" text="Customer">
+						<padding>
+							<Insets top="20"/>
+						</padding>
+						<font>
+							<Font name="Cambria Math" size="16"/>
+						</font>
+					</Label>
+					<Label GridPane.rowIndex="11" GridPane.columnIndex="0" text="First Name"/>
+					<TextField fx:id="customerFirstName" GridPane.rowIndex="11" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="12" GridPane.columnIndex="0" text="Last Name"/>
+					<TextField fx:id="customerLastName" GridPane.rowIndex="12" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="13" GridPane.columnIndex="0" text="Phone Number"/>
+					<TextField fx:id="customerPhone" GridPane.rowIndex="13" GridPane.columnIndex="1"/>  
+					<Label GridPane.rowIndex="14" GridPane.columnIndex="0" text="Email Address"/>
+					<TextField fx:id="customerEmail" GridPane.rowIndex="14" GridPane.columnIndex="1"/> 
+				</GridPane>
+			<GridPane GridPane.rowIndex="0" GridPane.columnIndex="2" hgap="40" vgap="10">
+					<Label GridPane.rowIndex="0" GridPane.columnIndex="0" text="Architect Address">
+						<font>
+							<Font name="Cambria Math" size="16"/>
+						</font>
+					</Label>
+
+					
+					<Label GridPane.rowIndex="1" GridPane.columnIndex="0" text="House Number/Name"/>
+					<TextField fx:id="architectAdrHouse" GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="80"/>
+					<Label GridPane.rowIndex="2" GridPane.columnIndex="0" text="Street Name"/>
+					<TextField fx:id="architectAdrStreet" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="3" GridPane.columnIndex="0" text="City"/>
+					<TextField fx:id="architectAdrCity" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="4" GridPane.columnIndex="0" text="Post Code"/>
+					<TextField fx:id="architectAdrPostcode" GridPane.rowIndex="4" GridPane.columnIndex="1"/> 
+			
+					<Label GridPane.rowIndex="5" GridPane.columnIndex="0" text="Contractor Address">
+						<padding>
+							<Insets top="20"/>
+						</padding>
+						<font>
+							<Font name="Cambria Math" size="16"/>
+						</font>
+					</Label>
+					<Label GridPane.rowIndex="6" GridPane.columnIndex="0" text="House Number/Name"/>
+					<TextField fx:id="contractorAdrHouse" GridPane.rowIndex="6" GridPane.columnIndex="1" maxWidth="80"/>
+					<Label GridPane.rowIndex="7" GridPane.columnIndex="0" text="Street Name"/>
+					<TextField fx:id="contractorAdrStreet" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="8" GridPane.columnIndex="0" text="City"/>
+					<TextField fx:id="contractorAdrCity" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="9" GridPane.columnIndex="0" text="Post Code"/>
+					<TextField fx:id="contractorAdrPostcode" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+					
+					<Label GridPane.rowIndex="10" GridPane.columnIndex="0" text="Customer Address">
+						<padding>
+							<Insets top="20"/>
+						</padding>
+						<font>
+							<Font name="Cambria Math" size="16"/>
+						</font>
+					</Label>
+					<Label GridPane.rowIndex="11" GridPane.columnIndex="0" text="House Number/Name"/>
+					<TextField fx:id="customerAdrHouse" GridPane.rowIndex="11" GridPane.columnIndex="1" maxWidth="80"/>
+					<Label GridPane.rowIndex="12" GridPane.columnIndex="0" text="Street Name"/>
+					<TextField fx:id="customerAdrStreet" GridPane.rowIndex="12" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="13" GridPane.columnIndex="0" text="City"/>
+					<TextField fx:id="customerAdrCity" GridPane.rowIndex="13" GridPane.columnIndex="1"/>
+					<Label GridPane.rowIndex="14" GridPane.columnIndex="0" text="Post Code"/>
+					<TextField fx:id="customerAdrPostcode" GridPane.rowIndex="14" GridPane.columnIndex="1"/> 
+				</GridPane>
+			</GridPane>
+			<HBox>
+				<padding></padding>
+				<Button text="Submit" prefWidth="200" onAction="#submitButtonClicked"/>
+			</HBox>
+		</VBox>
+	</center>
+</BorderPane>
+
